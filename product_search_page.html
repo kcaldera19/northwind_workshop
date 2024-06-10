@@ -9,11 +9,33 @@
 <body>
     <h1>NorthWind product search</h1>
     <!-- the Dropdown  -->
-    <select id="producrtSearch">
+    <select id="productSearch">
         <option value="">Select One ...</option>
-        <option value="category">Search by category</option>
-        <option value="viewAll">view All</option>
+        <option value="category" id="category">Search by category</option>
+        <option value="viewAll" id="viewAll">view All</option>
     </select>
+    <!-- dropdown for the categories select and hiding it -->
+    <div id="categorySlectedDropdown" style="display:none;">
+        <select id="category">
+
+        </select>
+    </div>
+
+    <table id ="displayAllProducts">
+        <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+
+
+            </tr>
+            
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
     <!-- Table -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
