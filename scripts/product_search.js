@@ -3,58 +3,68 @@ window.onload = () => {
 
     let productDropdown = document.querySelector("#productSearch")
     let categoryDropdown = document.querySelector("#category")
-    let categorySelctedDropdown = document.querySelector("#categorySelectedDropdown")
+    let categorySelctedDropdown = document.querySelector("#categorySelectedDropdown");
+    let productTable = document.getElementById("displayAllProducts")
+
     productDropdown.addEventListener("change", function () {
         console.log("product dropdown changed:", this.value);
-        fetchTheDisplayProducts();
+        
         if (this.value === "category") {
-            categorySelctedDropdown.style.display = "block";
-           fetchCategories();
+            console.log("hiding product table");
+            productDropdown.style.display = "none";
+            categorySelctedDropdown.style.display ="block";
+            fetchCategories();
 
-        } else {
+        } else if(this.value === ""){
+            console.log("hiding product table");
+            productTable.style.display = "none"
+            categorySelctedDropdown.style.display = "none";
+        }else{
+            console.log("showing product table");
+            fetchTheDisplayProducts();
+            productTable.style.display ="block"
             categorySelctedDropdown.style.display = "none";
         }
     });
     categoryDropdown.addEventListener("change", function(){
         console.log("Category dropdown changed:", this.value);
-        fetchTheDisplayProducts();
-    });
-    
-       
+        fetchTheDisplayProducts(this.value);
+        console.log("showing product Table");
+        productTable.style.display ="block";
+    });    
 }
 
 // grabbing the products from the api
-function fetchTheDisplayProducts() {
+async function fetchTheDisplayProducts(categoryId) {
     let productTable = document.getElementById("displayAllProducts");
     productTable.innerHTML = "";
-    let selectedCategory = document.querySelector("#categorySelectedDropdown #category").value;
-    console.log("Selected Category ID:", selectedCategory);
+
 
     let url;
-    if (selectedCategory && selectedCategory !== "viewAll") {
+    if (categoryId && categoryId !== "viewAll") {
 
-        url = `http://localhost:8081/api/categories`;
+        url = `http://localhost:8081/api/categories/${categoryId}/products`;
 
     } else {
         url = `http://localhost:8081/api/products`
     }
     console.log("Fetch URL:", url); 
 
-    fetch(url)
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error('try again later');
-            } return response.json();
-        }).then(data => {
-            
-            // // console.log("API Response:", data);
-            // displayAllProducts(data);
+    try{
+        let response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('try again later');
+        }
+   let data = await response.json();
+        displayAllProducts(data);
 
-        }).catch((err) => {
-            console.log('rejected', err);
-            console.log("Product Endpoint URL:", url);
+    }catch(err){
+        console.log('rejected', err);
+        
 
-        });
+    }
+    
+      
 
 
 }
@@ -67,12 +77,12 @@ async function fetchCategories() {
     try {
 
         let response = await fetch(`http://localhost:8081/api/categories`)
-        console.log("categories",fetchCategories);
+        
         if (!response.ok) {
             throw new Error(`Cant grab product by category`);
         }
         categories = await response.json();
-            console.log("categories", categories);
+           
             displayAllCategories(categories);
         
     } catch (err) {
@@ -116,5 +126,3 @@ function displayAllProducts(products) {
 function selectOne() {
 
 }
-
-
