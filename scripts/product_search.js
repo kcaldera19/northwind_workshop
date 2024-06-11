@@ -1,18 +1,29 @@
 "use strict"
 window.onload = () => {
-
-    let productDropdown = document.querySelector("#productSearch")
-    let categoryDropdown = document.querySelector("#category")
+    
+    let productDropdown = document.querySelector("#productSearch");
+    let categoryDropdown = document.querySelector("#category");
     let categorySelctedDropdown = document.querySelector("#categorySelectedDropdown");
-    let productTable = document.getElementById("displayAllProducts")
-
+    
+    let productTable = document.getElementById("displayAllProducts");
+    
+    let categoryTable =document.getElementById("displayAllCategories");
+    fetchTheDisplayCategories();
     function toggleCategoryDropdown() {
         if (productDropdown.value === "category") {
             
             categorySelctedDropdown.style.display = "block";
             fetchCategories();
+            if(categoryTable){
+                categoryTable.style.display = "block";
+            }
+             
         } else {
             categorySelctedDropdown.style.display = "none";
+            if(categoryTable){
+                categoryTable.style.display = "none";
+            }
+           
         }
     }
     productDropdown.addEventListener("change", function () {
@@ -31,14 +42,21 @@ window.onload = () => {
    
     categoryDropdown.addEventListener("change", function () {
         console.log("Category dropdown changed:", this.value);
-        fetchTheDisplayProducts(this.value);
+        if(this.value !=="category"){
+            fetchTheDisplayProducts(this.value);
+            
+        }
         
-        productTable.style.display = "block";
+        
+        // productTable.style.display = "block";
     });
+    
+    
 }
 
 // grabbing the products from the api
 async function fetchTheDisplayProducts(categoryId) {
+    
     let productTable = document.getElementById("displayAllProducts");
     productTable.innerHTML = "";
 
@@ -46,9 +64,10 @@ async function fetchTheDisplayProducts(categoryId) {
     let url;
     if (categoryId && categoryId !== "viewAll") {
 
-        url = `http://localhost:8081/api/categories/${categoryId}/products`;
+        url = `http://localhost:8081/api/products/bycategory/${categoryId}`;
 
-    } else {
+    } 
+    else {
         url = `http://localhost:8081/api/products`
     }
     console.log("Fetch URL:", url);
@@ -73,29 +92,59 @@ async function fetchTheDisplayProducts(categoryId) {
 
 // grabing all the categories
 async function fetchCategories() {
+    
 
-    const categoryDropdown = document.getElementById("category");
+    let categoryDropdown = document.getElementById("category");
+    categoryDropdown.innerHTML ="";
 
     try {
         let response = await fetch("http://localhost:8081/api/categories");
+        if(!response.ok){
+            throw new Error("Failed to fetch categories");
+        }
+        
         let categories = await response.json();
         
-        // Clear existing options
-        categoryDropdown.innerHTML = "";
-
-        // Add new options
+        
         categories.forEach(category => {
-            const option = document.createElement("option");
+            let option = document.createElement("option");
             option.value = category.categoryId;
             option.textContent = category.name;
             categoryDropdown.appendChild(option);
         });
+        
+        
     } catch (err) {
         console.error("Error fetching categories:", err);
     }
+   
+}
 
 
 
+async function fetchTheDisplayCategories(categories){
+    console.log("Fetching categories",categories);
+    try{
+        let response = await fetch("http://localhost:8081/api/categories");
+        let categories = await response.json();
+        console.log("Fetched categories:", categories); 
+        displayAllCategories(categories);
+    }catch(err){
+        console.error("Error fetching categories:", err);
+    }
+}
+function displayAllCategories(categories){
+    let categoryTable = document.getElementById("displayAllCategories").getElementsByTagName('tbody')[0];;
+    
+    categoryTable.innerHTML = "";
+    categories.forEach(category=>{
+        let row = categoryTable.insertRow();
+        row.insertCell(0).textContent=category.categoryId;
+        row.insertCell(1).textContent=category.description;
+        row.insertCell(2).textContent=category.name;
+        
+    });
+    console.log("Table content:", categoryTable.innerHTML);
 }
 
 function displayAllProducts(products) {
@@ -115,6 +164,3 @@ function displayAllProducts(products) {
 
 
 
-function selectOne() {
-
-}
