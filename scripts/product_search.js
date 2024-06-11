@@ -8,7 +8,7 @@ window.onload = () => {
 
     function toggleCategoryDropdown() {
         if (productDropdown.value === "category") {
-            // productDropdown.style.display = "none";
+            
             categorySelctedDropdown.style.display = "block";
             fetchCategories();
         } else {
