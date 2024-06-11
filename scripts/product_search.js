@@ -6,32 +6,35 @@ window.onload = () => {
     let categorySelctedDropdown = document.querySelector("#categorySelectedDropdown");
     let productTable = document.getElementById("displayAllProducts")
 
-    productDropdown.addEventListener("change", function () {
-        console.log("product dropdown changed:", this.value);
-        
-        if (this.value === "category") {
-            console.log("hiding product table");
-            productDropdown.style.display = "none";
-            categorySelctedDropdown.style.display ="block";
+    function toggleCategoryDropdown() {
+        if (productDropdown.value === "category") {
+            // productDropdown.style.display = "none";
+            categorySelctedDropdown.style.display = "block";
             fetchCategories();
-
-        } else if(this.value === ""){
-            console.log("hiding product table");
-            productTable.style.display = "none"
-            categorySelctedDropdown.style.display = "none";
-        }else{
-            console.log("showing product table");
-            fetchTheDisplayProducts();
-            productTable.style.display ="block"
+        } else {
             categorySelctedDropdown.style.display = "none";
         }
+    }
+    productDropdown.addEventListener("change", function () {
+        console.log("product dropdown changed:", this.value);
+        toggleCategoryDropdown();
+        if (this.value === "viewAll") {
+            console.log("showing product table");
+            fetchTheDisplayProducts();
+            productTable.style.display = "block";
+        } else {
+            console.log("hiding product table");
+            fetchTheDisplayProducts();
+            productTable.style.display = "none";
+        }
     });
-    categoryDropdown.addEventListener("change", function(){
+   
+    categoryDropdown.addEventListener("change", function () {
         console.log("Category dropdown changed:", this.value);
         fetchTheDisplayProducts(this.value);
-        console.log("showing product Table");
-        productTable.style.display ="block";
-    });    
+        
+        productTable.style.display = "block";
+    });
 }
 
 // grabbing the products from the api
@@ -48,23 +51,21 @@ async function fetchTheDisplayProducts(categoryId) {
     } else {
         url = `http://localhost:8081/api/products`
     }
-    console.log("Fetch URL:", url); 
+    console.log("Fetch URL:", url);
 
-    try{
+    try {
         let response = await fetch(url);
         if (!response.ok) {
             throw new Error('try again later');
         }
-   let data = await response.json();
+        let data = await response.json();
         displayAllProducts(data);
 
-    }catch(err){
+    } catch (err) {
         console.log('rejected', err);
-        
+
 
     }
-    
-      
 
 
 }
@@ -72,39 +73,30 @@ async function fetchTheDisplayProducts(categoryId) {
 
 // grabing all the categories
 async function fetchCategories() {
-    let categories;
+
+    const categoryDropdown = document.getElementById("category");
 
     try {
+        let response = await fetch("http://localhost:8081/api/categories");
+        let categories = await response.json();
+        
+        // Clear existing options
+        categoryDropdown.innerHTML = "";
 
-        let response = await fetch(`http://localhost:8081/api/categories`)
-        
-        if (!response.ok) {
-            throw new Error(`Cant grab product by category`);
-        }
-        categories = await response.json();
-           
-            displayAllCategories(categories);
-        
+        // Add new options
+        categories.forEach(category => {
+            const option = document.createElement("option");
+            option.value = category.categoryId;
+            option.textContent = category.name;
+            categoryDropdown.appendChild(option);
+        });
     } catch (err) {
-        console.log('Error', err);
+        console.error("Error fetching categories:", err);
     }
 
-}
 
-function displayAllCategories(categories) {
-    
-    let categoryDropdown = document.querySelector("#categorySelectedDropdown #category");
-    categoryDropdown.innerHTML = "";
-    console.log(categoryDropdown)
-    categories.forEach(category => {
-        let option = document.createElement("option");
-        option.value = category.categoryId;
-        option.textContent = category.name;
-        categoryDropdown.appendChild(option);
 
-    })
 }
-// {productId: '6', productName: "Grandma's Boysenberry Spread", unitPrice: '25.0000', unitsInStock: '120', categoryId: 2, …}
 
 function displayAllProducts(products) {
     let productTable = document.getElementById("displayAllProducts");
