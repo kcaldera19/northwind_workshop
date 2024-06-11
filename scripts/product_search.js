@@ -3,6 +3,8 @@ window.onload = () => {
     
     let productDropdown = document.querySelector("#productSearch");
     let categoryDropdown = document.querySelector("#category");
+    
+    
     let categorySelctedDropdown = document.querySelector("#categorySelectedDropdown");
     
     let productTable = document.getElementById("displayAllProducts");
@@ -122,8 +124,8 @@ async function fetchCategories() {
 
 
 
-async function fetchTheDisplayCategories(categories){
-    console.log("Fetching categories",categories);
+async function fetchTheDisplayCategories(){
+    
     try{
         let response = await fetch("http://localhost:8081/api/categories");
         let categories = await response.json();
@@ -133,6 +135,7 @@ async function fetchTheDisplayCategories(categories){
         console.error("Error fetching categories:", err);
     }
 }
+
 function displayAllCategories(categories){
     let categoryTable = document.getElementById("displayAllCategories").getElementsByTagName('tbody')[0];;
     
@@ -145,6 +148,24 @@ function displayAllCategories(categories){
         
     });
     console.log("Table content:", categoryTable.innerHTML);
+}
+async function fetchProductsByCategory(categoryId) {
+    let productTable = document.getElementById("displayAllProducts");
+    productTable.innerHTML = "";
+
+    let url = `http://localhost:8081/api/products/bycategory/${categoryId}`;
+    console.log("Fetch URL:", url);
+
+    try {
+        let response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Failed to fetch products');
+        }
+        let data = await response.json();
+        displayAllProducts(data);
+    } catch (err) {
+        console.error('Error fetching products:', err);
+    }
 }
 
 function displayAllProducts(products) {
